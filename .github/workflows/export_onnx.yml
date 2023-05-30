@@ -1,0 +1,80 @@
+name: linux-export-onnx
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.jpg'
+      - 'LICENSE*'
+      - 'test_data/**'
+      - 'gradio/**'
+      - 'figures/**'
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.jpg'
+      - 'LICENSE*'
+      - 'test_data/**'
+      - 'gradio/**'
+      - 'figures/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc automake autoconf pkg-config bc m4 unzip zip curl git libssl-dev gzip ca-certificates
+
+      - name: Install deps
+        run: |
+          pip3 install numpy torch onnx
+
+      - name: Cache original models
+        id: cache-models
+        uses: actions/cache@v3
+        with:
+          key: models-original
+          path: |
+            ./saved_models/u2net_human_seg
+            ./saved_models/u2net_portrait
+
+      - name: Get original models
+        if: steps.cache-models.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p saved_models/u2net_human_seg
+          wget https://github.com/cocoa-xu/U-2-Net/releases/download/original/u2net_human_seg.pth -O saved_models/u2net_human_seg/u2net_human_seg.pth
+          mkdir -p saved_models/u2net_portrait
+          wget https://github.com/cocoa-xu/U-2-Net/releases/download/original/u2net_portrait.pth -O saved_models/u2net_portrait/u2net_portrait.pth
+
+      - name: Export Human Segmentation
+        run: |
+          python3 u2net_2onnx.py -v human_seg -o u2net_human_seg.onnx
+
+      - name: Export Portrait
+        run: |
+          python3 u2net_2onnx.py -v portrait -o u2net_portrait.onnx
+
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            u2net_human_seg.onnx
+            u2net_portrait.onnx

@@ -1,24 +1,9 @@
 name: linux-export-onnx
 
 on:
-  pull_request:
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.jpg'
-      - 'LICENSE*'
-      - 'test_data/**'
-      - 'gradio/**'
-      - 'figures/**'
   push:
-    branches:
-      - master
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.jpg'
-      - 'LICENSE*'
-      - 'test_data/**'
-      - 'gradio/**'
-      - 'figures/**'
+    tags:
+      - 'onnx-*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

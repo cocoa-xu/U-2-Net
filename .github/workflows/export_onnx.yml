@@ -51,11 +51,11 @@ jobs:
 
       - name: Export Human Segmentation
         run: |
-          python3 u2net_2onnx.py -v human_seg -o u2net_human_seg.onnx
+          python3 u2net_2onnx.py -v human_seg -o u2net_human_seg.onnx -s 320,320
 
       - name: Export Portrait
         run: |
-          python3 u2net_2onnx.py -v portrait -o u2net_portrait.onnx
+          python3 u2net_2onnx.py -v portrait -o u2net_portrait.onnx -s 512,512
 
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

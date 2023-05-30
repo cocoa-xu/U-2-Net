@@ -45,9 +45,9 @@ jobs:
         if: steps.cache-models.outputs.cache-hit != 'true'
         run: |
           mkdir -p saved_models/u2net_human_seg
-          wget https://github.com/cocoa-xu/U-2-Net/releases/download/original/u2net_human_seg.pth -O saved_models/u2net_human_seg/u2net_human_seg.pth
+          wget -q https://github.com/cocoa-xu/U-2-Net/releases/download/original/u2net_human_seg.pth -O saved_models/u2net_human_seg/u2net_human_seg.pth
           mkdir -p saved_models/u2net_portrait
-          wget https://github.com/cocoa-xu/U-2-Net/releases/download/original/u2net_portrait.pth -O saved_models/u2net_portrait/u2net_portrait.pth
+          wget -q https://github.com/cocoa-xu/U-2-Net/releases/download/original/u2net_portrait.pth -O saved_models/u2net_portrait/u2net_portrait.pth
 
       - name: Export Human Segmentation
         run: |
